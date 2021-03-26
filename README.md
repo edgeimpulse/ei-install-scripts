@@ -12,7 +12,7 @@ cd ei-install-scripts
 . ./install-linux.sh
 ```
 
-## macOS
+## macOS (WARNING: not working yet)
 
 ```
 . ./install-mac.sh
