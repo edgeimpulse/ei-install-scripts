@@ -1,4 +1,13 @@
 #!/bin/sh
+LINUX="false"
+while :; do
+	case $1 in
+		-l|--install-ei-linux) LINUX="true"
+		;;
+		*) break
+	esac
+	shift
+done
 sudo apt-get update && sudo apt-get install -y curl gcc g++ make build-essential sox ffmpeg
 if ! [ -x "$(command -v node)" ]; then
 	echo "Installing Node.js & npm..."
@@ -21,10 +30,12 @@ else
 	echo "Updating edge-impulse-cli..."
 	npm update -g edge-impulse-cli
 fi
-if ! [ -x "$(command -v edge-impulse-linux)" ]; then
-	echo "Installing edge-impulse-linux..."
-	npm install -g edge-impulse-linux
-else
-	echo "Updating edge-impulse-linux..."
-	npm update -g edge-impulse-linux
+if [ $LINUX = "true" ]; then
+	if ! [ -x "$(command -v edge-impulse-linux)" ]; then
+		echo "Installing edge-impulse-linux..."
+		npm install -g edge-impulse-linux
+	else
+		echo "Updating edge-impulse-linux..."
+		npm update -g edge-impulse-linux
+	fi
 fi
