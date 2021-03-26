@@ -6,32 +6,32 @@ if(-not($testchoco)) {
 }
 else {
     echo "Updating chocolatey..."
-    choco upgrade chocolatey
+    choco upgrade -y chocolatey
 }
 $testpython = powershell python --version
 if(-not($testpython)) {
     echo "Installing Python..."
-    choco install python
+    choco install -y python
 }
 else {
     echo "Updating Python..."
-    choco upgrade python
+    choco upgrade -y python
 }
 $testnode = powershell node -v
 if(-not($testnode)) {
     echo "Installing Node.js & npm..."
-    cinst nodejs.install
+    cinst -y nodejs.install
 }
 else {
     echo "Updating Node.js & npm..."
-    choco upgrade nodejs.install
+    choco upgrade -y nodejs.install
 }
-$testnode = powershell node -v
-if(-not($testnode)) {
-    echo "Installing Node.js & npm..."
-    cinst nodejs.install
+$testei = powershell npm info edge-impulse-cli version
+if(-not($testei)) {
+    echo "Installing edge-impulse-cli..."
+    npm install -g edge-impulse-cli
 }
 else {
-    echo "Updating Node.js & npm..."
-    choco upgrade nodejs.install
+    echo "Updating edge-impulse-cli..."
+    npm update -g edge-impulse-cli
 }
