@@ -10,7 +10,7 @@ while :; do
 	esac
 	shift
 done
-sudo apt-get update && sudo apt-get install -y curl gcc g++ make python build-essential sox ffmpeg
+sudo apt-get update && sudo apt-get install -y curl gcc g++ make python2 python3 build-essential sox ffmpeg
 if ! [ -x "$(command -v node)" ]; then
 	echo "Installing Node.js & npm..."
 	curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
