@@ -1,6 +1,6 @@
 # Edge Impulse CLI Install Scripts
 
-Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for your OS, then clone this repo to your computer from a command line terminal:
+[Install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for your OS, then clone this repo to your computer from a command line terminal (or from a PowerShell terminal on Windows):
 
 ```
 git clone https://github.com/edgeimpulse/ei-install-scripts.git
