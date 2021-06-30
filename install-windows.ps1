@@ -4,6 +4,9 @@ Param(
     [switch]$updateAll = $false
 );
 
+<# Add variable to track if an error was encountered #>
+$errors = $false
+
 <# Check/install/update Chocolatey #>
 $testchoco = &{choco -V} 2>&1
 Write-Host "Chocolatey version = $testchoco" -ForegroundColor green
@@ -115,14 +118,22 @@ if($testei -Match "edge-impulse-cli") {
     Write-Host "edge-impulse-cli version = $testei" -ForegroundColor green
 }
 elseif($testei -Match "The term 'npm' is not recognized") {
-    Write-Host "ERROR: Re-run this script and install Node.js & npm." -ForegroundColor red
+    $errors = $true
+    Write-Host "ERROR: Close this powershell window and start a new adminstrator PowerShell window." -ForegroundColor red
+    Write-Host "       Or, run 'refreshenv' and then re-run this script '.\install-windows.ps1'." -ForegroundColor red
 }
 else {
     Write-Host "ERROR: edge-impulse-cli cannot be found." -ForegroundColor red
     $install = Read-Host -Prompt "Install edge-impulse-cli? [yes/no]"
     if($install -like "yes") {
         Write-Host "Installing edge-impulse-cli..." -ForegroundColor magenta
-        npm install -g edge-impulse-cli
+        $testei = &{npm install -g edge-impulse-cli}
+        if($testei -Match "You need to install the latest version of Visual Studio") {
+        $errors = $true
+            Write-Host "ERROR: Follow the documentation below to install the latest version of Visual Studio." -ForegroundColor red
+            Write-Host "https://github.com/nodejs/node-gyp#on-windows" -ForegroundColor red
+            Write-Host "Then, re-run this script in a new administrator PowerShell window '.\install-windows.ps1." -ForegroundColor red
+        }
     }
 }
 if($updateAll) {
@@ -131,6 +142,9 @@ if($updateAll) {
 }
 
 <# Prompt refresh environment variables for new Python installations #>
-if ($install -like "yes") {
+if (($install -like "yes") -and (-not($errors))) {
     Write-Host "Run 'refreshenv' and close/reopen a new administrator PowerShell terminal to see installation changes." -ForegroundColor red -BackgroundColor black
+}
+else {
+    Write-Host "Errors occured during installation, please follow the red output text instructions above to continue." -ForegroundColor red -BackgroundColor black
 }
