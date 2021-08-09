@@ -9,15 +9,17 @@ $errors = $false
 
 <# Check/install/update Chocolatey #>
 $testchoco = & { choco -V } 2>&1
-Write-Host "Chocolatey version = $testchoco" -ForegroundColor green
-if (-not($testchoco)) {
+if ($testchoco -Match "'choco' is not recognized") {
     $install = Read-Host -Prompt "Install Chocolatey? [yes/no]"
     if ($install -like "yes") {
         Write-Host "Installing chocolatey..." -ForegroundColor magenta
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     }
 } 
-elseif ($updateAll) {
+elseif (-not($testchoco -Match "'choco' is not recognized")) {
+    Write-Host "Chocolatey version = $testchoco" -ForegroundColor green
+}
+if ($updateAll) {
     Write-Host "Updating chocolatey..." -ForegroundColor magenta
     choco upgrade -y chocolatey
 }
@@ -39,11 +41,6 @@ if (-not($pythonexists -Match "term 'py' is not recognized")) {
     }
 }
 else {
-    # Only one Python installation can be found
-    <#$pythondir = &{python -c "import sys; print(sys.executable)"} 2>&1
-    if(-not($pythonversion -Match "Python was not found")) {
-        Write-Host "Found $pythonversion in $pythondir" -ForegroundColor yellow
-    }#>
     if ($pythonversion -Match "Python 2") {
         $testpython2 = $pythonversion
     }
