@@ -1,12 +1,16 @@
 #Requires -RunAsAdministrator
 
+$pythonstring = "Python 3"
+$nodestring = "Node.js v14"
+$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
+
 function Refresh-Environment {
     # Reload the session so that we can find new installs
     refreshenv
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
 }
 
-function Mark-Success {
+function Write-Success {
 	[CmdletBinding()]
 	param(
 		[Parameter()]
@@ -16,86 +20,76 @@ function Mark-Success {
 	Write-Host "$Message" -ForegroundColor green
 }
 
-function Mark-Warning {
+function Write-Warning {
 	[CmdletBinding()]
 	param(
 		[Parameter()]
 		[string] $Message
 	)
-	Write-Host "[>_<] " -NoNewLine -ForegroundColor red
-	Write-Host "$Message" -ForegroundColor red
+	Write-Host "[>_<] " -NoNewLine -ForegroundColor yellow
+	Write-Host "$Message" -ForegroundColor yellow
 }
 
-function Mark-Error {
+function Write-Error {
 	[CmdletBinding()]
 	param(
 		[Parameter()]
 		[string] $Message
 	)
     Write-Host ""
-	Mark-Warning -Message $Message
+	Write-Warning -Message $Message
     Write-Host ""
     Exit 1
 }
 
 function Install-Node {
-    $appstring = "Node.js v14"
     Write-Host ""
-    Mark-Warning -Message "$appstring cannot be found."
-    Write-Host "      If $appstring is already installed, check that it is in your PATH." -ForegroundColor red
-    Write-Host ""
-    $install = Read-Host -Prompt "Do you want to install $appstring ($Arch) from https://nodejs.org? [yes/no]"
+    Write-Warning -Message "$nodestring cannot be found."
+    Write-Host "      If $nodestring is already installed, check that it is in your PATH." -ForegroundColor red
+    $install = $(Write-Host ""; Write-Host "Do you want to install $nodestring ($Arch) from https://nodejs.org? [yes/no] " -ForegroundColor magenta -NoNewLine; Read-Host)
     if ($install -like "yes") {
-        Write-Host ""
-        Write-Host "Installing $appstring ($Arch), this may take a while..." -ForegroundColor magenta
-        Write-Host ""
+        Write-Host "Downloading the $nodestring ($Arch) installer..."
         if ($Arch -eq 'x86') {
             Invoke-WebRequest -Uri "https://nodejs.org/dist/v14.18.1/node-v14.18.1-x86.msi" -Outfile nodev14.msi
         }
         elseif ($Arch -eq 'amd64') {
             Invoke-WebRequest -Uri "https://nodejs.org/dist/v14.18.1/node-v14.18.1-x64.msi" -Outfile nodev14.msi
         }
-
-        # Install from downloaded installer
+        Write-Host "Installing $nodestring ($Arch), this may take a while..."
         start -wait .\nodev14.msi /qn
         del .\nodev14.msi   # Delete installer
         Refresh-Environment
     }
     else {
-        Mark-Error -Message "Cancelled. Please install $appstring and run this command again."
+        Write-Error -Message "Cancelled. Please install $nodestring and run this command again."
     }
 }
 
 function Install-Python {
-    $appstring = "Python 3"
     Write-Host ""
-    Mark-Warning -Message "$appstring cannot be found."
-    Write-Host "      If $appstring is already installed, check that it is in your PATH." -ForegroundColor red
-    Write-Host ""
-    $install = Read-Host -Prompt "Do you want to install $appstring ($Arch) from https://python.org? [yes/no]"
+    Write-Warning -Message "$pythonstring cannot be found."
+    Write-Host "      If $pythonstring is already installed, check that it is in your PATH." -ForegroundColor red
+    $install = $(Write-Host ""; Write-Host "Do you want to install $pythonstring ($Arch) from https://python.org? [yes/no] " -ForegroundColor magenta -NoNewLine; Read-Host)
     if ($install -like "yes") {
-        Write-Host ""
-        Write-Host "Installing $appstring ($Arch), this may take a while..." -ForegroundColor magenta
-        Write-Host ""
+        Write-Host "Downloading the $pythonstring ($Arch) installer..."
         if ($Arch -eq 'x86') {
             Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.8/python-3.9.8.exe" -Outfile python3.exe
         }
         elseif ($Arch -eq 'amd64') {
             Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.8/python-3.9.8-amd64.exe" -Outfile python3.exe
         }
-
-        # Install from downloaded installer
+        Write-Host "Installing $pythonstring ($Arch), this may take a while..."
         start -wait .\python3.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1"
         del .\python3.exe   # Delete installer
         Refresh-Environment
     }
     else {
-        Mark-Error -Message "Cancelled. Please install $appstring and run this command again."
+        Write-Error -Message "Cancelled. Please install $pythonstring and run this command again."
     }
 }
 
 function Check-Node {
-    Write-Host "Checking if you have Node.js v14 installed..."
+    Write-Host "Checking if you have $nodestring installed..."
     Try{
         $nodeversion = & {node --version}
         if (!($nodeversion -like "*v14*")) {
@@ -108,14 +102,14 @@ function Check-Node {
     }
 
     $result = Invoke-Expression "node --version"
-    Mark-Success -Message "$result installed"
+    Write-Success -Message "$result installed"
 }
 
 function Check-Python {
-    Write-Host "Checking if you have Python 3 installed..."
+    Write-Host "Checking if you have $pythonstring installed..."
     Try{
         $pythonversion = & {python --version}
-        if (!($pythonversion -like "*Python 3.*")) {
+        if (!($pythonversion -like "*$pythonstring.*")) {
             Install-Python
         }
     }
@@ -124,23 +118,23 @@ function Check-Python {
     }
 
     $result = Invoke-Expression "python --version"
-    Mark-Success -Message "$result installed"
+    Write-Success -Message "$result installed"
 }
 
 function Check-BuildTools{
     Write-Host ""
-    Write-Host "The Edge Impulse CLI requires some ot the build tools for C++ to be" -ForegroundColor magenta
-    Write-Host "installed in your computer. If you have a fully functional Visual Studio" -ForegroundColor magenta
-    Write-Host "environment for C++ development, or if you prefer to check, troubleshoot" -ForegroundColor magenta
-    Write-Host "and install the tools manually, you may skip this check. Otherwise, we" -ForegroundColor magenta
-    Write-Host "will use the build tools installer for Visual Studio 2019 to check and" -ForegroundColor magenta
-    Write-Host "install all the required tools. The installation needs up to 5GB of free" -ForegroundColor magenta
-    Write-Host "space and may take several minutes to complete." -ForegroundColor magenta
-    $install = Read-Host -Prompt "Do you want to continue checking the build tools for C++? [yes/no]"
+    Write-Host "The Edge Impulse CLI requires some of the build tools for C++ to be"
+    Write-Host "installed in your computer. If you already have a functional environment"
+    Write-Host "for C++ development, or if you prefer to check, troubleshoot and install"
+    Write-Host "the tools manually, you may skip this check. Otherwise, we will download"
+    Write-Host "and execute the build tools bootstrap installer for Visual Studio 2019"
+    Write-Host "to check and install the required tools. The installation needs up to 5GB"
+    Write-Host "of free space and may take several minutes to complete."
+    $install = $(Write-Host ""; Write-Host "Do you want this script to check for, and install, the required build tools? [yes/skip] " -ForegroundColor magenta -NoNewLine; Read-Host)
     if ($install -like "yes") {
+        Write-Host "Downloading the Visual Studio 2019 build tools installer..."
         Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -Outfile vs_buildtools.exe
-
-        # Install from downloaded installer
+        Write-Host "Checking build tools for missing components. This may take several minutes..."
         start -wait .\vs_buildtools.exe -ArgumentList "--quiet --wait --norestart ^
                                                     --add Microsoft.VisualStudio.Workload.VCTools ^
                                                     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 ^
@@ -152,14 +146,12 @@ function Check-BuildTools{
     }
 }
 
-Write-Host ""
 Refresh-Environment
 # Check if running in admin shell
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (!($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
-    Mark-Error -Message "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
+    Write-Error -Message "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
 }
-$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
 Check-BuildTools
 Check-Python
 Check-Node
@@ -167,7 +159,7 @@ Try{
     $result = & {npm install -g edge-impulse-cli}
 }
 Catch{
-    Mark-Error -Message "Could not install Edge Impulse CLI. Please correct the errors and try again."
+    Write-Error -Message "Could not install Edge Impulse CLI. Please correct the errors and try again."
 }
-
-Mark-Success -Message "Edge Impulse CLI installed successfully. Please restart your computer before using it!"
+Write-Success -Message "Edge Impulse CLI installed successfully!"
+Write-Host "      PLEASE REBOOT YOUR COMPUTER BEFORE USING IT!"
