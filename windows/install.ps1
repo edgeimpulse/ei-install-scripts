@@ -102,7 +102,7 @@ function Check-Node {
     }
 
     $result = Invoke-Expression "node --version"
-    Write-Success -Message "$result installed"
+    Write-Success -Message "Node.js $result installed!"
 }
 
 function Check-Python {
@@ -118,7 +118,7 @@ function Check-Python {
     }
 
     $result = Invoke-Expression "python --version"
-    Write-Success -Message "$result installed"
+    Write-Success -Message "$result installed!"
 }
 
 function Check-BuildTools{
