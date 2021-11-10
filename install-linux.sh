@@ -3,9 +3,8 @@ LINUX="false"
 UPDATE="false"
 while :; do
 	case $1 in
-		-l|--install-ei-linux) LINUX="true"
-		-u|--update-all) UPDATE="true"
-		;;
+		-l|--install-ei-linux) LINUX="true";;
+		-u|--update-all) UPDATE="true";;
 		*) break
 	esac
 	shift
