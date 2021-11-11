@@ -6,8 +6,8 @@
 
 Open a Powershell window **with Administrator privileges** and run:
 
-```
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/edgeimpulse/ei-install-scripts/raw/main/install-windows.ps1'))
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/main/install-windows.ps1" -Outfile install.ps1; iex .\install.ps1; del .\install.ps1
 ```
 
 ## Using the repo
