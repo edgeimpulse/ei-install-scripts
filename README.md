@@ -1,5 +1,17 @@
 # Edge Impulse CLI Install Scripts
 
+## Quick Start
+
+### Windows
+
+Open a Powershell window **with Administrator privileges** and run:
+
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/edgeimpulse/ei-install-scripts/raw/main/install-windows.ps1'))
+```
+
+## Using the repo
+
 [Install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for your OS, then clone this repo to your computer from a command line terminal (or from a PowerShell terminal on Windows):
 
 ```sh

@@ -1,152 +1,191 @@
 #Requires -RunAsAdministrator
-Param(
-    [Parameter(Mandatory = $false)]
-    [switch]$updateAll = $false
-);
 
-<# Add variable to track if an error was encountered #>
-$errors = $false
+$CLI_STRING = "Edge Impulse CLI"
+$BUILD_TOOLS_STRING = "Build Tools for Windows"
+$PY_REQ_STR = "Python 3.7 or higher"
+$PY_INSTALL_STR = "Python 3.9"
+$NODE_REQ_STR = "Node.js v12 or higher"
+$NODE_INSTALL_STR = "Node.js v14"
+$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"]
 
-<# Check/install/update Chocolatey #>
-$testchoco = & { choco -V } 2>&1
-if ($testchoco -Match "'choco' is not recognized") {
-    $install = Read-Host -Prompt "Install Chocolatey? [yes/no]"
-    if ($install -like "yes") {
-        Write-Host "Installing chocolatey..." -ForegroundColor magenta
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    }
-} 
-elseif (-not($testchoco -Match "'choco' is not recognized")) {
-    Write-Host "Chocolatey version = $testchoco" -ForegroundColor green
-}
-if ($updateAll) {
-    Write-Host "Updating chocolatey..." -ForegroundColor magenta
-    choco upgrade -y chocolatey
+function Refresh-Environment {
+    # Reload the session so that we can find new installs
+    # refreshenv
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 }
 
-<# Check for existing Python installations #>
-$pythonexists = & { py -0 } 2>&1
-$pythonversion = & { python -V } 2>&1
-$testpython2 = $false
-$testpython3 = $false
-if (-not($pythonexists -Match "term 'py' is not recognized")) {
-    #Write-Host $pythonexists -ForegroundColor yellow
-    $testpython2 = & { py -2 -V } 2>&1
-    $testpython3 = & { py -3 -V } 2>&1
-    if (-not($testpython2 -Match "Python 2")) {
-        $testpython2 = $false
-    }
-    if (-not($testpython3 -Match "Python 3")) {
-        $testpython3 = $false
-    }
-}
-else {
-    if ($pythonversion -Match "Python 2") {
-        $testpython2 = $pythonversion
-    }
-    if ($pythonversion -Match "Python 3") {
-        $testpython3 = $pythonversion
-    }
+function Write-Success([String]$Message) {
+	Write-Host "[^_^] " -NoNewLine -ForegroundColor green
+	Write-Host "$Message" -ForegroundColor green
 }
 
-<# Check/install/update Python 2 #>
-if ($testpython2) {
-    Write-Host "Python 2 version = $testpython2" -ForegroundColor green
-}
-elseif ((-not($pythonexists -Match "-2.")) -or (-not($pythonversion -Match "Python 2"))) {
-    Write-Host "ERROR: Python 2 cannot be found." -ForegroundColor red
-    Write-Host "       If Python 2 is already installed, check that it is in your PATH." -ForegroundColor red
-    $install = Read-Host -Prompt "Install Python 2 with Chocolatey? [yes/no]"
-    if ($install -like "yes") {
-        Write-Host "Installing Python 2..." -ForegroundColor magenta
-        choco install -y python2
-    }
-}
-if ($updateAll) {
-    Write-Host "Updating Python 2..." -ForegroundColor magenta
-    choco upgrade -y python2
+function Write-Warning([String]$Message) {
+	Write-Host "[>_<] " -NoNewLine -ForegroundColor yellow
+	Write-Host "$Message" -ForegroundColor yellow
 }
 
-<# Check/install/update Python 3 #>
-if ($testpython3) {
-    Write-Host "Python 3 version = $testpython3" -ForegroundColor green
-}
-elseif ((-not($pythonexists -Match "-3.")) -or (-not($pythonversion -Match "Python 3"))) {
-    Write-Host "ERROR: Python 3 cannot be found." -ForegroundColor red
-    Write-Host "       If Python 3 is already installed, check that it is in your PATH." -ForegroundColor red
-    $install = Read-Host -Prompt "Install Python 3 with Chocolatey? [yes/no]"
-    if ($install -like "yes") {
-        Write-Host "Installing Python 3..." -ForegroundColor magenta
-        choco install -y python3
-    }
-}
-if ($updateAll) {
-    Write-Host "Updating Python 3..." -ForegroundColor magenta
-    choco upgrade -y python3
+function Write-Error([String]$Message) {
+    Write-Host ""
+	Write-Warning $Message
+    Write-Host ""
+    Exit 1
 }
 
-<# Check/install/update Node & npm #>
-$testnode = & { node -v } 2>&1
-$testnpm = & { npm -v } 2>&1
-if (-not($testnode -Match "The term 'node' is not recognized")) {
-    Write-Host "Node.js version = $testnode" -ForegroundColor green
-    if (-not($testnpm -Match "The term 'npm' is not recognized")) {
-        Write-Host "npm version = $testnpm" -ForegroundColor green
-    }
-}
-else {
-    Write-Host "ERROR: Node.js cannot be found." -ForegroundColor red
-    Write-Host "       If Node.js is already installed, check that it is in your PATH." -ForegroundColor red
-    $install = Read-Host -Prompt "Install Node.js & npm with Chocolatey? [yes/no]"
-    if ($install -like "yes") {
-        Write-Host "Installing Node.js & npm..." -ForegroundColor magenta
-        cinst -y nodejs.install
-    }
-}
-if ($updateAll) {
-    Write-Host "Updating Node.js & npm..." -ForegroundColor magenta
-    choco upgrade -y nodejs.install
-}
-
-<# Check/install/update edge-impulse-cli #>
-$testei = & { npm list --depth 1 --global edge-impulse-cli } 2>&1
-if ($testei -Match "edge-impulse-cli") {
-    #$testei = $testei -replace "^.*?`-"
-    Write-Host "edge-impulse-cli version = $testei" -ForegroundColor green
-}
-elseif ($testei -Match "The term 'npm' is not recognized") {
-    $errors = $true
-    Write-Host "ERROR: Close this powershell window and start a new adminstrator PowerShell window." -ForegroundColor red
-    Write-Host "       Or, run 'refreshenv' and then re-run this script '.\install-windows.ps1'" -ForegroundColor red
-}
-else {
-    Write-Host "ERROR: edge-impulse-cli cannot be found." -ForegroundColor red
-    $install = Read-Host -Prompt "Install edge-impulse-cli? [yes/no]"
-    if ($install -like "yes") {
-        Write-Host "Installing edge-impulse-cli (this may take a minute)..." -ForegroundColor magenta
-        $OFS = "`r`n"
-        $cmdOutput = & { npm install -g node-gyp; npm install -g edge-impulse-cli } 2>&1
-        Write-Host $($cmdOutput | Out-String)
-        if ($cmdOutput -Match "You need to install the latest version of Visual Studio") {
-            Write-Host "ERROR: Visual Studio Build Tools are not installed." -ForegroundColor red
-            $install = Read-Host -Prompt "Install Visual Studio Build Tools with Chocolatey? [yes/no]"
-            if ($install -like "yes") {
-                Write-Host "Installing Visual Studio Build Tools & edge-impulse-cli..." -ForegroundColor magenta
-                choco install -y visualstudio2019buildtools visualstudio2019-workload-vctools
-                npm install -g edge-impulse-cli
+function Install-Node {
+    Try{
+        Write-Host ""
+        Write-Warning "Could not find $NODE_REQ_STR."
+        Write-Host "      If $NODE_REQ_STR is already installed, check that it is in your PATH." -ForegroundColor yellow
+        $install = $(Write-Host "      Do you want to install $NODE_INSTALL_STR ($Arch) from nodejs.org? [y/N] " -ForegroundColor magenta -NoNewLine; Read-Host)
+        if (($install -like "y") -or ($install -like "Y")) {
+            Write-Host "Downloading the $NODE_INSTALL_STR ($Arch) installer, this may take a few minutes..."
+            if ($Arch -eq 'x86') {
+                Invoke-WebRequest -Uri "https://nodejs.org/dist/v14.18.1/node-v14.18.1-x86.msi" -Outfile nodev14.msi
             }
+            elseif ($Arch -eq 'amd64') {
+                Invoke-WebRequest -Uri "https://nodejs.org/dist/v14.18.1/node-v14.18.1-x64.msi" -Outfile nodev14.msi
+            }
+            Write-Host "Installing $NODE_INSTALL_STR ($Arch), this may take a few minutes..."
+            start -wait .\nodev14.msi /qn
+            del .\nodev14.msi   # Delete installer
+            Refresh-Environment
+        }
+        else {
+            Write-Error "Cancelled. Please install $NODE_REQ_STR and run this command again."
         }
     }
-}
-if ($updateAll) {
-    Write-Host "Updating edge-impulse-cli..." -ForegroundColor magenta
-    npm update -g edge-impulse-cli
+    Catch{
+        Write-Error "$NODE_INSTALL_STR installation terminated unexpectedly. Please try again."
+    }
 }
 
-<# Prompt refresh environment variables for new Python installations #>
-if (($install -like "yes") -and (-not($errors))) {
-    Write-Host "`nRun 'refreshenv' and close/reopen a new administrator PowerShell terminal to see installation changes." -ForegroundColor red -BackgroundColor black
+function Install-Python {
+    Try{
+        Write-Host ""
+        Write-Warning "Could not find $PY_REQ_STR."
+        Write-Host "      If $PY_REQ_STR is already installed, check that it is in your PATH." -ForegroundColor yellow
+        $install = $(Write-Host "      Do you want to install $PY_INSTALL_STR ($Arch) from python.org? [y/N] " -ForegroundColor magenta -NoNewLine; Read-Host)
+        if (($install -like "y") -or ($install -like "Y")) {
+            Write-Host "Downloading the $PY_INSTALL_STR ($Arch) installer, this may take a few minutes..."
+            if ($Arch -eq 'x86') {
+                Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.8/python-3.9.8.exe" -Outfile python3.exe
+            }
+            elseif ($Arch -eq 'amd64') {
+                Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.8/python-3.9.8-amd64.exe" -Outfile python3.exe
+            }
+            Write-Host "Installing $PY_INSTALL_STR ($Arch), this may take a few minutes while..."
+            start -wait .\python3.exe -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1"
+            del .\python3.exe   # Delete installer
+            Refresh-Environment
+        }
+        else {
+            Write-Error "Cancelled. Please install $PY_REQ_STR and run this command again."
+        }
+    }
+    Catch{
+        Write-Error "$PY_INSTALL_STR installation terminated unexpectedly. Please try again."
+    }
 }
-elseif (($install -like "yes") -and ($errors)) {
-    Write-Host "`nErrors occured during installation, please follow the instructions above to continue." -ForegroundColor red -BackgroundColor black
+
+function Install-BuildTools {
+    Try{
+        Write-Host "Downloading the $BUILD_TOOLS_STRING bootstrapper, this may take a few minutes..."
+        Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -Outfile vs_buildtools.exe
+        Write-Host "Checking your $BUILD_TOOLS_STRING configuration. This may take several minutes..."
+        start -wait .\vs_buildtools.exe -ArgumentList "--quiet --wait --norestart ^
+        #                                              --add Microsoft.VisualStudio.Component.Windows10SDK.19041 ^
+                                                        --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        # start -wait .\vs_buildtools.exe -ArgumentList "--quiet --wait --norestart ^
+        #                                             --add Microsoft.VisualStudio.Component.VC.CMake.Project ^
+        #                                             --add Microsoft.VisualStudio.Component.Windows10SDK ^
+        del .\vs_buildtools.exe   # Delete installer
+        Refresh-Environment
+    }
+    Catch{
+        Write-Error "$BUILD_TOOLS_STR installation terminated unexpectedly. Please try again."
+    }
 }
+
+function Check-Node {
+    Write-Host "Checking if you have $NODE_REQ_STR installed..."
+    Try{
+        $nodeversion = & {node --version}
+        $nodeversion = $nodeversion -replace 'v',''
+        if ([System.Version]$nodeversion -lt  [System.Version]"12.0.0") {
+            Install-Node
+        }
+    }
+    Catch{
+        # Command doesn't exist, install it!
+        Install-Node
+    }
+
+    $result = Invoke-Expression "node --version"
+    Write-Success "Node.js $result installed!"
+}
+
+function Check-Python {
+    Write-Host "Checking if you have $PY_REQ_STR installed..."
+    Try{
+        $pyversion = & {python --version}
+        $pyversion = $pyversion -replace 'Python ',''
+        $pyversion = $pyversion -replace 'python ',''
+        if ($pyversion -like "2.*") {
+            if (([System.Version]$pyversion -lt  [System.Version]"2.7.0")) {
+                Install-Python
+            }
+        }
+        if ($pyversion -like "3.*") {
+            if (([System.Version]$pyversion -lt  [System.Version]"3.7.0")) {
+                Install-Python
+            }
+        }
+        else {
+            Install-Python
+        }
+    }
+    Catch{
+        Install-Python
+    }
+
+    $result = Invoke-Expression "python --version"
+    Write-Success "$result installed!"
+}
+
+function Install-CLI {
+    Try{
+        Write-Host "Installing the $CLI_STRING..."
+        Write-Host "npm install -g edge-impulse-cli"
+        npm install -g edge-impulse-cli
+        Refresh-Environment
+        Check-CLI
+    }
+    Catch{
+        Write-Error "Failed to install $CLI_STRING. Please report the issue."
+    }
+}
+
+function Check-CLI{
+    Try{
+        $eicliversion = & {edge-impulse-blocks -V}
+        if ($eicliversion -like "1.*") {
+            Write-Success "$CLI_STRING $eicliversion installed!"
+            Exit
+        }
+    }
+    Catch{
+    }
+    Write-Warning "$CLI_STRING is not installed."
+}
+
+Refresh-Environment
+# Check if running in admin shell
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (!($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
+    Write-Error "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
+}
+Check-CLI
+Check-Node
+Check-Python
+Install-BuildTools
+Install-CLI
