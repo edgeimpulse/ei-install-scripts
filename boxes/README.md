@@ -29,10 +29,10 @@ You can use homebrew to install most of the test requirements
 
 ## Getting Started
 
-1. Switch to the directory for the box you want to test (e.g. for windows 10):
+1. Switch to the directory for the box you want to test:
     - For Windows 10:
         ```
-        cd tests\boxes\windows-10
+        cd boxes\windows-10
         ```
 2. Start the vagrant box and wait for the command to finish (may take several minutes)
     ```
@@ -45,10 +45,10 @@ You can use homebrew to install most of the test requirements
 4. Switch to the vagrant directory
     - On Windows:
         ```
-        cd ..\..\vagrant
+        cd C:\vagrant
         ```
 6. Run the installation script
     - On Windows:
         ```
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex .\install.ps1
+        .\install-windows.ps1
         ```
