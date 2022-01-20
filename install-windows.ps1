@@ -1,5 +1,7 @@
 #Requires -RunAsAdministrator
 
+echo "Starting installation..."
+
 $CLI_STRING = "Edge Impulse CLI"
 $BUILD_TOOLS_STRING = "Build Tools for Windows"
 $PY_REQ_STR = "Python 3.7 or higher"
