@@ -1,5 +1,7 @@
 #Requires -RunAsAdministrator
 
+echo "Starting Installation..."
+
 $CLI_STRING = "Edge Impulse CLI"
 $BUILD_TOOLS_STRING = "Build Tools for Windows"
 $PY_REQ_STR = "Python 3.7 or higher"
@@ -8,7 +10,7 @@ $NODE_REQ_STR = "Node.js v12 or higher"
 $NODE_INSTALL_STR = "Node.js v14"
 $Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"]
 
-echo "Starting Installation..."
+echo "Tick..."
 
 function Refresh-Environment {
     # Reload the session so that we can find new installs
