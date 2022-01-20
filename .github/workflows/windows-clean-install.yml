@@ -22,7 +22,7 @@ jobs:
           echo "Protocol is now $Protocol"
       - name: 👉🏽 Download script
         run: |
-          iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/main/install-windows.ps1" -Outfile install.ps1;
+          iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/${{ github.head_ref }}/install-windows.ps1" -Outfile install.ps1;
           dir;
       - name: 👉🏽 Execute script
         run: |
