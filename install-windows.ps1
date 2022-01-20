@@ -1,7 +1,5 @@
 #Requires -RunAsAdministrator
 
-echo "Starting installation..."
-
 $CLI_STRING = "Edge Impulse CLI"
 $BUILD_TOOLS_STRING = "Build Tools for Windows"
 $PY_REQ_STR = "Python 3.7 or higher"
@@ -180,12 +178,15 @@ function Check-CLI{
     Write-Warning "$CLI_STRING is not installed."
 }
 
+Write-Success "Starting installation..."
 Refresh-Environment
+Write-Success "Refreshed Environment"
 # Check if running in admin shell
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (!($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     Write-Error "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
 }
+Write-Success "Running as admin"
 Check-CLI
 Check-Node
 Check-Python

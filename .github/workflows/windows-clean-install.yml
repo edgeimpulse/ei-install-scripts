@@ -26,7 +26,7 @@ jobs:
           dir;
       - name: 👉🏽 Execute script
         run: |
-          Invoke-Expression -Command "$pwd\install.ps1";
+          iex .\install.ps1;
           dir;
       - name: 👉🏽 Delete script
         run: |
