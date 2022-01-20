@@ -3,13 +3,18 @@
 echo "Starting Installation..."
 
 $CLI_STRING = "Edge Impulse CLI"
+echo "Tick..."
 $BUILD_TOOLS_STRING = "Build Tools for Windows"
+echo "Tick..."
 $PY_REQ_STR = "Python 3.7 or higher"
+echo "Tick..."
 $PY_INSTALL_STR = "Python 3.9"
+echo "Tick..."
 $NODE_REQ_STR = "Node.js v12 or higher"
+echo "Tick..."
 $NODE_INSTALL_STR = "Node.js v14"
+echo "Tick..."
 $Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"]
-
 echo "Tick..."
 
 function Refresh-Environment {
