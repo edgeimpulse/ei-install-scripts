@@ -1,5 +1,8 @@
 name: Windows Clean Install
-on: [push]
+on:
+  push:
+    branches:
+      - 'test*'
 jobs:
   Windows-Clean-Install:
     runs-on: windows-latest
