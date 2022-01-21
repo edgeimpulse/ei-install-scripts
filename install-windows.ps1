@@ -13,7 +13,8 @@ $NODE_REQ_STR = "Node.js v12 or higher";
 echo "Tick...";
 $NODE_INSTALL_STR = "Node.js v14";
 echo "Tick...";
-$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
+$Arch = ('x86', 'amd64')[[bool] ${env:ProgramFiles(x86)}];
+# $Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
 echo "Tick...";
 
 function Refresh-Environment {
