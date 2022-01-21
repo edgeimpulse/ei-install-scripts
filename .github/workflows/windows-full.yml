@@ -1,10 +1,13 @@
 name: Windows One Liner
-on: [push]
+on:
+  pull_request:
+    branches:
+      - main
 jobs:
   Windows-One-Liner:
-    runs-on: windows-latest
+    runs-on: [windows-2019, windows-2022]
     steps:
-      - name: 👉🏽 Test as a one-liner
+      - name: 👉🏽 Install as a one-liner
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/${{ github.ref_name }}/install-windows.ps1" -Outfile install.ps1; iex .\install.ps1; del .\install.ps1;
       - name: 👉🏽 Test edge-impulse-cli

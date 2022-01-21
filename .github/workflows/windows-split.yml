@@ -1,8 +1,12 @@
-name: Windows Step by Step
-on: [push]
+# Use this when testing new windows commands for the one-liner script
+name: Windows Split Commands
+on:
+  push:
+    branches:
+      - 'win-test*'
 jobs:
   Windows-Step-by-Step:
-    runs-on: windows-latest
+    runs-on: [windows-2019, windows-2022]
     steps:
       - name: 👉🏽 Update Execution Policy
         run: |

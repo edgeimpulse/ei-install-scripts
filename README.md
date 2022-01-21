@@ -25,7 +25,7 @@ Or, [download this repository as a `.zip` file](https://github.com/edgeimpulse/e
 cd ei-install-scripts-main
 ```
 
-## Linux/Ubuntu/Raspbian, etc.
+### Linux/Ubuntu/Raspbian, etc.
 
 From a command line terminal run:
 
@@ -33,7 +33,7 @@ From a command line terminal run:
 . ./install-linux.sh
 ```
 
-## macOS
+### macOS
 
 From a command line terminal run:
 
@@ -41,7 +41,7 @@ From a command line terminal run:
 . ./install-mac.sh
 ```
 
-## Windows
+### Windows
 
 From a PowerShell terminal run:
 
@@ -50,6 +50,8 @@ Start-Process powershell.exe -ArgumentList ("-NoExit",("cd {0}" -f (Get-Location
 <# Click Yes, then from the new PowerShell window, run: #>
 .\install-windows.ps1
 ```
+
+## Troubleshooting
 
 If you get the following error from `.\install-windows.ps1`:
 
@@ -66,3 +68,7 @@ At line:1 char:1
 ```
 
 Then instead run the script from an administrator PowerShell terminal with the following command: `powershell -ExecutionPolicy Bypass -File .\install-windows.ps1`
+
+## Contributing to the repo
+
+This repo uses github actions to run installer tests on windows (and soon) Mac and Linux. Tests run on every pull-request but you can also run tests on every push if you name your branch as `win-test*`, `mac-test*` or `linux-test*` respectively.
