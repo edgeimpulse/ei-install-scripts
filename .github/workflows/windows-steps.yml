@@ -6,11 +6,11 @@ on:
       - 'win-test*'
 jobs:
   Windows-Step-by-Step:
-  runs-on: ${{ matrix.os }}
-  strategy:
-    matrix:
-      os: [windows-2019, windows-2022]
-      node: [12, 14, 16]
+    strategy:
+      matrix:
+        os: [windows-2019, windows-2022]
+        node: [12, 14, 16]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: 👉🏽 Update Execution Policy
         run: |
