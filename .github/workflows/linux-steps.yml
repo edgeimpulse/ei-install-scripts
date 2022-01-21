@@ -1,11 +1,11 @@
-# Use this when testing new windows commands for the one-liner script
-name: Windows Split Commands
+# Use this when testing new linux commands for the one-liner script
+name: Linux Split Commands
 on:
   push:
     branches:
       - 'linux-test*'
 jobs:
-  Windows-Step-by-Step:
+  Linux-Step-by-Step:
     runs-on: [ubuntu-latest]
     steps:
       - name: 👉🏽 Download script
