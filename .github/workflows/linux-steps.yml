@@ -17,7 +17,7 @@ jobs:
           bash ./install.sh
       - name: 👉🏽 Delete script
         run: |
-          rm ./install.ps1
+          rm ./install.sh
           ls
       - name: 👉🏽 Test edge-impulse-cli
         run: |
