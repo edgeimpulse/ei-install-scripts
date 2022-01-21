@@ -1,11 +1,9 @@
-name: Windows Clean Install
+name: Windows Step by Step
 on: [push]
 jobs:
-  Windows-Clean-Install:
+  Windows-Step-by-Step:
     runs-on: windows-latest
     steps:
-      - name: 👉🏽 Configure
-        run: $VerbosePreference = "Continue"
       - name: 👉🏽 Update Execution Policy
         run: |
           $Policy = Get-ExecutionPolicy -Scope Process;
@@ -26,14 +24,13 @@ jobs:
           dir;
       - name: 👉🏽 Execute script
         run: |
-          dir;
-          Get-Content -Path .\install.ps1 -TotalCount 5
-          Invoke-Expression -Command ".\install.ps1";
+          iex .\install.ps1;
           dir;
       - name: 👉🏽 Delete script
         run: |
           del .\install.ps1;
           dir;
-      - name: 👉🏽 Test as a one-liner
+      - name: 👉🏽 Test edge-impulse-cli
         run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/main/install-windows.ps1" -Outfile install.ps1; iex .\install.ps1; del .\install.ps1;
+          edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav;
+          edge-impulse-daemon --version;

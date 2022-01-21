@@ -1,21 +1,13 @@
 #Requires -RunAsAdministrator
 
-echo "Starting Installation...";
-$CLI_STRING = "Edge Impulse CLI";
-echo "Tick...";
-$BUILD_TOOLS_STRING = "Build Tools for Windows";
-echo "Tick...";
-$PY_REQ_STR = "Python 3.7 or higher";
-echo "Tick...";
-$PY_INSTALL_STR = "Python 3.9";
-echo "Tick...";
-$NODE_REQ_STR = "Node.js v12 or higher";
-echo "Tick...";
-$NODE_INSTALL_STR = "Node.js v14";
-echo "Tick...";
-$Arch = ('x86', 'amd64')[[bool] ${env:ProgramFiles(x86)}];
+$CLI_STRING = "Edge Impulse CLI"
+$BUILD_TOOLS_STRING = "Build Tools for Windows"
+$PY_REQ_STR = "Python 3.7 or higher"
+$PY_INSTALL_STR = "Python 3.9"
+$NODE_REQ_STR = "Node.js v12 or higher"
+$NODE_INSTALL_STR = "Node.js v14"
+$Arch = ('x86', 'amd64')[[bool] ${env:ProgramFiles(x86)}]
 # $Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
-echo "Tick...";
 
 function Refresh-Environment {
     # Reload the session so that we can find new installs
@@ -23,21 +15,15 @@ function Refresh-Environment {
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 }
 
-echo "Tick..."
-
 function Write-Success([String]$Message) {
 	Write-Host "[^_^] " -NoNewLine -ForegroundColor green
 	Write-Host "$Message" -ForegroundColor green
 }
 
-echo "Tick..."
-
 function Write-Warning([String]$Message) {
 	Write-Host "[>_<] " -NoNewLine -ForegroundColor yellow
 	Write-Host "$Message" -ForegroundColor yellow
 }
-
-echo "Tick..."
 
 function Write-Error([String]$Message) {
     Write-Host ""
@@ -45,8 +31,6 @@ function Write-Error([String]$Message) {
     Write-Host ""
     Exit 1
 }
-
-echo "Tick..."
 
 function Install-Node {
     Try{
@@ -76,8 +60,6 @@ function Install-Node {
     }
 }
 
-echo "Tick..."
-
 function Install-Python {
     Try{
         Write-Host ""
@@ -106,8 +88,6 @@ function Install-Python {
     }
 }
 
-echo "Tick..."
-
 function Install-BuildTools {
     Try{
         Write-Host "Downloading the $BUILD_TOOLS_STRING bootstrapper, this may take a few minutes..."
@@ -127,8 +107,6 @@ function Install-BuildTools {
     }
 }
 
-echo "Tick..."
-
 function Check-Node {
     Write-Host "Checking if you have $NODE_REQ_STR installed..."
     Try{
@@ -146,8 +124,6 @@ function Check-Node {
     $result = Invoke-Expression "node --version"
     Write-Success "Node.js $result installed!"
 }
-
-echo "Tick..."
 
 function Check-Python {
     Write-Host "Checking if you have $PY_REQ_STR installed..."
@@ -177,8 +153,6 @@ function Check-Python {
     Write-Success "$result installed!"
 }
 
-echo "Tick..."
-
 function Install-CLI {
     Try{
         Write-Host "Installing the $CLI_STRING..."
@@ -191,8 +165,6 @@ function Install-CLI {
         Write-Error "Failed to install $CLI_STRING. Please report the issue."
     }
 }
-
-echo "Tick..."
 
 function Check-CLI{
     Try{
@@ -207,8 +179,6 @@ function Check-CLI{
     Write-Warning "$CLI_STRING is not installed."
 }
 
-echo "Tick..."
-
 Refresh-Environment
 Write-Success "Refreshed Environment"
 # Check if running in admin shell
@@ -216,7 +186,7 @@ $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Pri
 if (!($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     Write-Error "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
 }
-Write-Success "Running as admin"
+Write-Success "Running as admin on $Arch"
 Check-CLI
 Check-Node
 Check-Python
