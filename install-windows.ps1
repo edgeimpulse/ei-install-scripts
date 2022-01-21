@@ -1,14 +1,13 @@
 #Requires -RunAsAdministrator
 
-echo "Starting installation..."
-
 $CLI_STRING = "Edge Impulse CLI"
 $BUILD_TOOLS_STRING = "Build Tools for Windows"
 $PY_REQ_STR = "Python 3.7 or higher"
 $PY_INSTALL_STR = "Python 3.9"
 $NODE_REQ_STR = "Node.js v12 or higher"
 $NODE_INSTALL_STR = "Node.js v14"
-$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"]
+$Arch = ('x86', 'amd64')[[bool] ${env:ProgramFiles(x86)}]
+# $Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables["PROCESSOR_ARCHITECTURE"];
 
 function Refresh-Environment {
     # Reload the session so that we can find new installs
@@ -181,11 +180,13 @@ function Check-CLI{
 }
 
 Refresh-Environment
+Write-Success "Refreshed Environment"
 # Check if running in admin shell
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (!($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     Write-Error "This script must be run from an Administrator session. Please open a new session using 'Run as Administrator' and try again."
 }
+Write-Success "Running as admin on $Arch"
 Check-CLI
 Check-Node
 Check-Python

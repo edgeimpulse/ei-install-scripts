@@ -1,14 +1,13 @@
-name: Windows Clean Install
+# Use this when testing new windows commands for the one-liner script
+name: Windows Split Commands
 on:
   push:
     branches:
-      - 'test*'
+      - 'win-test*'
 jobs:
-  Windows-Clean-Install:
-    runs-on: windows-latest
+  Windows-Step-by-Step:
+    runs-on: [windows-2019, windows-2022]
     steps:
-      - name: 👉🏽 Configure
-        run: $VerbosePreference = "Continue"
       - name: 👉🏽 Update Execution Policy
         run: |
           $Policy = Get-ExecutionPolicy -Scope Process;
@@ -25,16 +24,17 @@ jobs:
           echo "Protocol is now $Protocol"
       - name: 👉🏽 Download script
         run: |
-          iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/main/install-windows.ps1" -Outfile install.ps1;
+          iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/${{ github.ref_name }}/install-windows.ps1" -Outfile install.ps1;
           dir;
       - name: 👉🏽 Execute script
         run: |
-          Invoke-Expression -Command "$pwd\install.ps1";
+          iex .\install.ps1;
           dir;
       - name: 👉🏽 Delete script
         run: |
           del .\install.ps1;
           dir;
-      - name: 👉🏽 Test as a one-liner
+      - name: 👉🏽 Test edge-impulse-cli
         run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iwr -Uri "https://raw.githubusercontent.com/edgeimpulse/ei-install-scripts/main/install-windows.ps1" -Outfile install.ps1; iex .\install.ps1; del .\install.ps1;
+          edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav;
+          edge-impulse-daemon --version;
