@@ -5,7 +5,11 @@ on:
       - main
 jobs:
   Windows-One-Liner:
-    runs-on: [windows-2019, windows-2022]
+    strategy:
+      matrix:
+        os: [windows-2019, windows-2022]
+        node: [12, 14, 16]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: 👉🏽 Install as a one-liner
         run: |
