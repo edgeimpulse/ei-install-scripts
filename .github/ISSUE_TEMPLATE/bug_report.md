@@ -7,10 +7,6 @@ assignees: ''
 
 ---
 
-### Issue description
-
-<!-- Describe your issue here. -->
-
 ### Expected Behavior
 
 <!-- Describe what should happen. -->
