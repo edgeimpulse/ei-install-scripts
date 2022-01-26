@@ -1,3 +1,11 @@
+---
+name: Bug report
+about: Use this template for reporting a bug or to help us improve ei-install-scripts.
+title: ''
+labels: ''
+assignees: ''
+---
+
 ### Expected Behavior
 <!-- Describe what should happen. -->
 
