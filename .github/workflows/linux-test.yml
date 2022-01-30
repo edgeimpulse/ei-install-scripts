@@ -23,4 +23,5 @@ jobs:
         run: |
           OUTPUT=$(edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav)
           echo $OUTPUT
-          edge-impulse-daemon --version
+          if [ "$OUTPUT" == *"Invalid API key"* ]; then echo "Failed as expected!" fi
+          # edge-impulse-daemon --version
