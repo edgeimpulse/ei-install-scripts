@@ -111,6 +111,6 @@ warning "TODO: Check that we are running with privileges!"
 check_cli
 check_node
 check_python
-install_buildtools
+# install_buildtools
 install_cli
 
