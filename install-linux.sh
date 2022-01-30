@@ -103,7 +103,7 @@ check_python () {
   success "$PYTHON_VERSION installed!"
 }
 
-warning "TODO: Check that we are running with priviledges!"
+warning "TODO: Check that we are running with privileges!"
 check_cli
 check_node
 check_python
