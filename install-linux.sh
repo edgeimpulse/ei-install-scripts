@@ -77,7 +77,7 @@ check_node () {
 check_python () {
   echo "Checking if you have $PY_REQ_STR installed..."
   PYTHON_VERSION=$(python --version)
-  if [ -z $PYTHON_VERSION ]; then
+  if [ -z "$PYTHON_VERSION" ]; then
     install_python
   else
     PYTHON_VERSION=${PYTHON_VERSION/"Python "/""}
