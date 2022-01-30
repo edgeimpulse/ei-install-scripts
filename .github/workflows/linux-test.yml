@@ -21,7 +21,7 @@ jobs:
           ls
       - name: 👉🏽 Test edge-impulse-cli
         run: |
-          OUTPUT=$(edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav)
+          OUTPUT=$(edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav 2>&1)
           echo $OUTPUT
           echo "Test"
           # if [ "$OUTPUT" == *"Invalid API key"* ]; then echo "Failed as expected!"; fi
