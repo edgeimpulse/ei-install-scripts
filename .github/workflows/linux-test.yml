@@ -19,12 +19,13 @@ jobs:
         run: |
           rm ./install.sh
           ls
-      - name: 👉🏽 Test uploader
-        run: |
-          set +e # Ignore Errors
-          OUTPUT=$(edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav 2>&1)
-          if [ "$OUTPUT" == *"Invalid API key"* ]; then echo "Failed as expected!"; else echo "Test failed!" && exit 1; fi
       - name: 👉🏽 Test serialport
         run: |
           set -e # Throw Errors
           edge-impulse-daemon --version
+      - name: 👉🏽 Test uploader
+        run: |
+          set +e # Ignore Errors
+          OUTPUT=$(edge-impulse-uploader --api-key notarealkey --category training path/to/file.wav 2>&1)
+          echo $OUTPUT
+          if [ "$OUTPUT" == *"Invalid API key"* ]; then echo "Failed as expected!"; else echo "Test failed!" && exit 1; fi
