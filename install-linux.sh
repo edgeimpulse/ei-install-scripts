@@ -5,7 +5,7 @@ GREEN="\033[32m"
 NORMAL="\033[0m"
 
 CLI_STRING="Edge Impulse CLI"
-# BUILD_TOOLS_STRING="Build Tools for Windows"
+BUILD_TOOLS_STRING="Build Tools"
 PY_REQ_STR="Python 3.7 or higher"
 # PY_INSTALL_STR="Python 3.9"
 NODE_REQ_STR="Node.js v12 or higher"
@@ -51,6 +51,10 @@ install_node () {
 
 install_python () {
   error "TODO: Install $PY_REQ_STR!"
+}
+
+install_buildtools () {
+  error "TODO: Install $BUILD_TOOLS_STRING!"
 }
 
 version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
