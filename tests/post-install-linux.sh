@@ -11,7 +11,7 @@ assert_contains () {
   # $1: Test name
   # $2: Command
   # $3: Expected output
-  # $4: Expected code
+  # $4: Expected return code
   OUTPUT=$($2 2>&1) # Redirect stderr to stdout
   CODE="$?"
   # echo "$OUTPUT"
