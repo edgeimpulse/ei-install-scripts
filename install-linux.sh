@@ -1,42 +1,112 @@
 #!/bin/sh
-LINUX="false"
-UPDATE="false"
-while :; do
-	case $1 in
-		-l|--install-ei-linux) LINUX="true";;
-		-u|--update-all) UPDATE="true";;
-		*) break
-	esac
-	shift
-done
-sudo apt-get update && sudo apt-get install -y curl gcc g++ make python2 python3 build-essential sox ffmpeg
-if ! [ -x "$(command -v node)" ]; then
-	echo "Installing Node.js & npm..."
-	curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-	sudo apt-get install -y nodejs
-	node -v
-fi
-NPM_PREFIX=$(npm config get prefix)
-echo "npm prefix = " $NPM_PREFIX
-if [ $NPM_PREFIX = '/usr/local' ] || [ $NPM_PREFIX = '/usr' ]; then
-	echo "Setting npm prefix to ~/.npm-global ..."
-	mkdir ~/.npm-global
-	npm config set prefix '~/.npm-global'
-	echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
-fi
-if ! [ -x "$(command -v edge-impulse-daemon)" ]; then
-	echo "Installing edge-impulse-cli..."
-	npm install -g edge-impulse-cli
-elif [ $UPDATE = "true" ]; then
-	echo "Updating edge-impulse-cli..."
-	npm update -g edge-impulse-cli
-fi
-if [ $LINUX = "true" ]; then
-	if ! [ -x "$(command -v edge-impulse-linux)" ]; then
-		echo "Installing edge-impulse-linux..."
-		npm install -g edge-impulse-linux
-	elif [ $UPDATE = "true" ]; then
-		echo "Updating edge-impulse-linux..."
-		npm update -g edge-impulse-linux
-	fi
-fi
+
+YELLOW="\033[33m"
+GREEN="\033[32m"
+NORMAL="\033[0m"
+
+CLI_STRING="Edge Impulse CLI"
+# BUILD_TOOLS_STRING="Build Tools for Windows"
+PY_REQ_STR="Python 3.7 or higher"
+# PY_INSTALL_STR="Python 3.9"
+NODE_REQ_STR="Node.js v12 or higher"
+# NODE_INSTALL_STR="Node.js v14"
+
+success () {
+  echo ""
+  echo -e "$GREEN[^_^] $* $NORMAL"
+  echo ""
+}
+
+warning () {
+  echo ""
+  echo -e "$YELLOW[>_<] $* $NORMAL"
+  echo ""
+}
+
+error () {
+  warning "$*"
+  exit 1
+}
+
+install_cli () {
+  echo "Installing the $CLI_STRING..."
+  echo "npm install -g edge-impulse-cli"
+  npm install -g edge-impulse-cli
+  check_cli
+}
+
+check_cli () {
+  CLI_VERSION=$(edge-impulse-blocks -V)
+  if [[ "$CLI_VERSION" == "1."* ]]; then
+	  success "$CLI_STRING $CLI_VERSION installed!"
+    exit
+  else
+    warning "$CLI_STRING is not installed."
+  fi
+}
+
+install_node () {
+  error "TODO: Install $NODE_REQ_STR!"
+}
+
+install_python () {
+  error "TODO: Install $PY_REQ_STR!"
+}
+
+version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+check_node () {
+  echo "Checking if you have $NODE_REQ_STR installed..."
+  NODE_VERSION=$(node --version)
+  if [ -z $NODE_VERSION ]; then
+    install_node
+  else
+    NODE_VERSION=${NODE_VERSION/"v"/""}
+    if [ $(version $NODE_VERSION) -lt $(version "12") ]; then
+      install_node
+    fi
+  fi
+  NODE_VERSION=$(node --version)
+  success "Node.js $NODE_VERSION installed!"
+}
+
+check_python () {
+  echo "Checking if you have $PY_REQ_STR installed..."
+  PYTHON_VERSION=$(python --version)
+  if [ -z $PYTHON_VERSION ]; then
+    install_python
+  else
+    PYTHON_VERSION=${PYTHON_VERSION/"Python "/""}
+    PYTHON_VERSION=${PYTHON_VERSION/"python "/""}
+
+    case $PYTHON_VERSION in
+
+      "2"*)
+        if [ $(version $PYTHON_VERSION) -lt $(version "2.7") ]; then
+          install_python
+        fi
+        ;;
+
+      "3"*)
+        if [ $(version $PYTHON_VERSION) -lt $(version "3.7") ]; then
+          install_python
+        fi
+        ;;
+
+      *)
+        install_python
+        ;;
+    esac
+
+  fi
+  PYTHON_VERSION=$(python --version)
+  success "$PYTHON_VERSION installed!"
+}
+
+warning "TODO: Check that we are running with priviledges!"
+check_cli
+check_node
+check_python
+install_buildtools
+install_cli
+
